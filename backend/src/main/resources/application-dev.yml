@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./.data/cms-agent;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: ""
+cms:
+  security:
+    admin-password: ${CMS_ADMIN_PASSWORD:dev-admin-change-me}
+    editor-password: ${CMS_EDITOR_PASSWORD:dev-editor-change-me}

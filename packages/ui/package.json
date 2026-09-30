@@ -1,0 +1,1 @@
+{"name":"@cms-agent/ui","version":"0.1.0","private":true,"type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@cms-agent/contracts":"workspace:*","@cms-agent/api-client":"workspace:*","vue":"3.5.41","ant-design-vue":"4.2.6"}}

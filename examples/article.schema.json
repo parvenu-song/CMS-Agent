@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "code": "article",
+  "title": "文章管理",
+  "fields": [
+    {"name":"title","label":"标题","type":"text","required":true,"list":true},
+    {"name":"content","label":"正文","type":"textarea","required":true,"list":false},
+    {"name":"author","label":"作者","type":"text","required":false,"list":true},
+    {"name":"status","label":"状态","type":"select","required":true,"list":true,"options":["draft","published","archived"]}
+  ]
+}

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${CMS_DATABASE_URL}
+    username: ${CMS_DATABASE_USER}
+    password: ${CMS_DATABASE_PASSWORD}
+server:
+  servlet:
+    session:
+      cookie:
+        secure: ${CMS_COOKIE_SECURE:true}
+cms:
+  security:
+    admin-password: ${CMS_ADMIN_PASSWORD}
+    editor-password: ${CMS_EDITOR_PASSWORD}
