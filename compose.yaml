@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: cms_agent
+      POSTGRES_USER: cms_agent
+      POSTGRES_PASSWORD: ${CMS_DATABASE_PASSWORD:?Set CMS_DATABASE_PASSWORD in .env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cms_agent -d cms_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_ADDRESS: 0.0.0.0
+      CMS_DATABASE_URL: jdbc:postgresql://db:5432/cms_agent
+      CMS_DATABASE_USER: cms_agent
+      CMS_DATABASE_PASSWORD: ${CMS_DATABASE_PASSWORD:?Set CMS_DATABASE_PASSWORD}
+      CMS_ADMIN_PASSWORD: ${CMS_ADMIN_PASSWORD:?Set CMS_ADMIN_PASSWORD}
+      CMS_EDITOR_PASSWORD: ${CMS_EDITOR_PASSWORD:?Set CMS_EDITOR_PASSWORD}
+      CMS_COOKIE_SECURE: ${CMS_COOKIE_SECURE:-true}
+      CMS_AGENT_URL: ${CMS_AGENT_URL:-}
+      CMS_AGENT_KEY: ${CMS_AGENT_KEY:-}
+      CMS_AGENT_MODEL: ${CMS_AGENT_MODEL:-}
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    ports:
+      - "127.0.0.1:8088:80"
+    depends_on:
+      - api
+volumes:
+  postgres-data:

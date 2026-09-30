@@ -1,0 +1,57 @@
+name: Verify CMS Agent
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm test
+      - run: pnpm typecheck
+      - run: pnpm build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-and-lockfile
+          path: |
+            apps/admin/dist
+            pnpm-lock.yaml
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate a module and compile it with the real backend
+        run: |
+          node --experimental-strip-types packages/agent-core/cli.mjs generate examples/article.schema.json --out .generated/ci
+          cp -r .generated/ci/backend/src/main/java/com/cmsagent/generated backend/src/main/java/com/cmsagent/
+      - run: mvn -B -ntp -f backend/pom.xml verify
+      - name: HTTP smoke with real cookies and CSRF
+        run: |
+          java -jar backend/target/cms-agent-api-0.1.0.jar > /tmp/cms-api.log 2>&1 &
+          API_PID=$!
+          trap 'kill $API_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8080/actuator/health; then break; fi
+            sleep 2
+          done
+          node scripts/smoke.mjs || { cat /tmp/cms-api.log; exit 1; }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: backend/target/surefire-reports

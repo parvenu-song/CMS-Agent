@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:cms-test;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+cms:
+  security:
+    admin-password: test-admin-password-123
+    editor-password: test-editor-password-123

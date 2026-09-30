@@ -1,0 +1,16 @@
+{
+  "name": "cms-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.3",
+  "engines": {"node": ">=22.12.0"},
+  "scripts": {
+    "dev": "pnpm --filter @cms-agent/admin dev",
+    "build": "pnpm --filter @cms-agent/admin build",
+    "typecheck": "pnpm --filter @cms-agent/admin typecheck",
+    "test": "node --experimental-strip-types --test packages/agent-core/test/*.test.ts",
+    "agent": "node --experimental-strip-types packages/agent-core/cli.mjs"
+  },
+  "devDependencies": {"typescript": "~5.9.3", "@types/node": "^22.18.0"}
+}
